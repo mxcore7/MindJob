@@ -13,6 +13,9 @@ class RecommendationService
     public function getRecommendedJobs(User $user, $limit = 10)
     {
         $userSkills = $user->skills ?? [];
+        if (is_string($userSkills)) {
+            $userSkills = json_decode($userSkills, true) ?? [];
+        }
         
         // If user has no skills, return recent jobs without score
         if (empty($userSkills)) {
@@ -29,6 +32,9 @@ class RecommendationService
         // Calculate match score for each job
         $jobs->each(function ($job) use ($userSkillsLower) {
             $jobSkills = $job->skills_required ?? [];
+            if (is_string($jobSkills)) {
+                $jobSkills = json_decode($jobSkills, true) ?? [];
+            }
             if (empty($jobSkills)) {
                 $job->match_score = 0;
                 return;
