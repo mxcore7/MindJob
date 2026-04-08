@@ -20,34 +20,39 @@ class ExternalJobService
      * Search and fetch jobs from JSearch (RapidAPI)
      * Aggregates results from Google Jobs, Indeed, LinkedIn, etc.
      */
-    public function fetchJobs(string $query = 'developer', string $location = '', int $numPages = 1): array
+    public function fetchJobs(string $query = 'developer', string $location = '', int $numPages = 1, string $country = 'us'): array
     {
         if (empty($this->rapidApiKey)) {
             Log::warning('ExternalJobService: RAPIDAPI_KEY is not set in .env');
             return [];
         }
 
-        $searchQuery = $location ? "{$query} in {$location}" : $query;
+        // Format: "X jobs in Y" as per JSearch API docs
+        $searchQuery = $location ? "{$query} jobs in {$location}" : "{$query} jobs";
 
         try {
-            $response = Http::withHeaders([
-                'x-rapidapi-key' => $this->rapidApiKey,
-                'x-rapidapi-host' => $this->rapidApiHost,
-            ])->get("https://{$this->rapidApiHost}/search", [
-                'query' => $searchQuery,
-                'page' => '1',
-                'num_pages' => (string) $numPages,
-                'date_posted' => 'month', // jobs from the last month
-            ]);
+            $response = Http::withoutVerifying()
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'x-rapidapi-key' => $this->rapidApiKey,
+                    'x-rapidapi-host' => $this->rapidApiHost,
+                ])->get("https://{$this->rapidApiHost}/search", [
+                    'query' => $searchQuery,
+                    'page' => '1',
+                    'num_pages' => (string) $numPages,
+                    'country' => $country,
+                    'date_posted' => 'all',
+                ]);
 
             if ($response->successful()) {
                 $data = $response->json('data', []);
+                Log::info("ExternalJobService: API returned " . count($data) . " jobs for '{$searchQuery}'");
                 return $this->normalizeAndStore($data);
             }
 
             Log::error('ExternalJobService: API error', [
                 'status' => $response->status(),
-                'body' => $response->body(),
+                'body' => substr($response->body(), 0, 500),
             ]);
         } catch (\Exception $e) {
             Log::error('ExternalJobService: Exception', ['message' => $e->getMessage()]);
@@ -77,7 +82,7 @@ class ExternalJobService
                 continue;
             }
 
-            // Extract skills from description (basic keyword extraction)
+            // Extract skills from description
             $skills = $this->extractSkills($extJob['job_description'] ?? '');
 
             // Build salary string
@@ -88,7 +93,7 @@ class ExternalJobService
                 'company' => $company,
                 'description' => $this->cleanDescription($extJob['job_description'] ?? ''),
                 'skills_required' => $skills,
-                'location' => $extJob['job_city'] 
+                'location' => $extJob['job_city']
                     ? ($extJob['job_city'] . ', ' . ($extJob['job_country'] ?? ''))
                     : ($extJob['job_country'] ?? 'Remote'),
                 'salary' => $salary,
@@ -129,7 +134,7 @@ class ExternalJobService
             }
         }
 
-        return array_slice(array_unique($found), 0, 8); // max 8 skills
+        return array_slice(array_unique($found), 0, 8);
     }
 
     /**

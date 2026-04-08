@@ -19,7 +19,7 @@ const scoreClass = computed(() => {
           {{ job.company?.charAt(0) }}
         </div>
         <div class="min-w-0">
-          <h3 class="text-base font-bold text-slate-200 group-hover:text-white transition-colors truncate">{{ job.title }}</h3>
+          <h3 class="text-base font-bold text-slate-200 group-hover:text-white transition-colors line-clamp-2 break-words">{{ job.title }}</h3>
           <p class="text-sm text-primary-light font-medium">{{ job.company }}</p>
         </div>
       </div>
