@@ -39,7 +39,7 @@ class ExternalJobService
     /**
      * Fetch jobs from France Travail API
      */
-    public function fetchFranceTravailJobs(string $query = 'développeur', string $location = ''): array
+    public function fetchFranceTravailJobs(string $query = 'informatique', string $location = ''): array
     {
         return $this->franceTravailService->fetchAndStore($query, $location);
     }

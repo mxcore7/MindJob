@@ -26,7 +26,7 @@ class FranceTravailService
     public function getAccessToken(): string
     {
         return Cache::remember('france_travail_token', 1200, function () {
-            $response = Http::asForm()->post($this->tokenUrl . '?realm=/partenaire', [
+            $response = Http::withoutVerifying()->asForm()->post($this->tokenUrl . '?realm=/partenaire', [
                 'grant_type'    => 'client_credentials',
                 'client_id'     => $this->clientId,
                 'client_secret' => $this->clientSecret,
@@ -52,7 +52,7 @@ class FranceTravailService
     {
         $token = $this->getAccessToken();
 
-        $response = Http::withToken($token)
+        $response = Http::withoutVerifying()->withToken($token)
             ->withHeaders(['Accept' => 'application/json'])
             ->get("{$this->apiUrl}/offres/search", $params);
 
@@ -74,7 +74,7 @@ class FranceTravailService
     {
         $token = $this->getAccessToken();
 
-        $response = Http::withToken($token)
+        $response = Http::withoutVerifying()->withToken($token)
             ->withHeaders(['Accept' => 'application/json'])
             ->get("{$this->apiUrl}/offres/{$id}");
 
@@ -88,7 +88,7 @@ class FranceTravailService
     /**
      * Rechercher et stocker les offres dans la table jobs
      */
-    public function fetchAndStore(string $query = 'développeur', string $location = '', int $maxResults = 149): array
+    public function fetchAndStore(string $query = 'informatique', string $location = '', int $maxResults = 149): array
     {
         if (empty($this->clientId) || $this->clientId === 'ton_client_id') {
             Log::warning('FranceTravailService: Client ID is not configured in .env');

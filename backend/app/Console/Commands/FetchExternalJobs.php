@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 class FetchExternalJobs extends Command
 {
     protected $signature = 'jobs:fetch 
-        {query=developer : Search query for jobs}
+        {query=informatique : Search query for jobs}
         {--location= : Location filter (e.g. "Paris", "75" for France Travail)}
         {--pages=1 : Number of pages to fetch (JSearch only)}
         {--country=us : Country code (us, fr, gb, de, etc.)}
