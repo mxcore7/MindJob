@@ -1,3 +1,4 @@
+Here is a breakdown of the role of each directory in your **MindJob** project. The project is split into a **Laravel** backend and a **Vue 3** frontend.
 
 ### 🔌 Backend (Laravel)
 
@@ -25,7 +26,7 @@ The backend follows the typical MVC (Model-View-Controller) architecture of Lara
 
 ### 🎨 Frontend (Vue 3 + Vite)
 
-the frontend is a Single Page Application (SPA) built with Vue 3, using Pinia for state management and Vue Router for navigation.
+Your frontend is a Single Page Application (SPA) built with Vue 3, using Pinia for state management and Vue Router for navigation.
 
 *   **`public/`**: Static files that are served exactly as they are without going through the build tool (e.g., the site's favicon).
 *   **`src/`**: The heart of the Vue application where all the front-end code lives.
@@ -38,3 +39,16 @@ the frontend is a Single Page Application (SPA) built with Vue 3, using Pinia fo
     *   **`views/`**: Page-level components. Each file here corresponds to a full page seen by the user (like `JobsPage.vue` or `JobDetailPage.vue`).
     *   **`main.js`**: The main Javascript entry point. It creates the Vue app instance, injects the router and stores, and mounts it to the DOM.
 *   **`node_modules/`**: Third-party JavaScript libraries installed by NPM (do not edit these manually).
+
+---
+
+### 🐙 Git Commands
+
+Git is the version control system used to track changes in your code. Here are the essential commands you asked about:
+
+*   **`git pull`**: Fetches the latest changes from the remote repository (e.g., GitHub) and merges them into your local codebase. Running this ensures you are working with the most up-to-date version of the project.
+*   **`git commit -m "message"`**: Saves your staged changes locally with a descriptive message. It creates a "checkpoint" in your project's history.
+*   **`git push`**: Uploads your local commits (saved checkpoints) to the remote repository, making them available online or ready for deployment.
+*   **`git stash`**: Temporarily shelves (or "stashes") any uncommitted changes you have made. This is very useful when you need to switch branches or `git pull` new changes, but aren't ready to commit your current work yet. You can restore these shelved changes later by running `git stash pop`.
+*   **`git add .`**: Stages all your modified and new files. This is the step you do *before* running `git commit`.
+*   **`git status`**: Shows the current state of your working directory (which files are modified, staged, or untracked).
