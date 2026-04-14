@@ -17,6 +17,7 @@ class Job extends Model
         'location',
         'salary',
         'source',
+        'contract_type',
     ];
 
     protected function casts(): array

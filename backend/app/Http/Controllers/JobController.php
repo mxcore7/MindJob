@@ -13,12 +13,22 @@ class JobController extends Controller
 
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where('title', 'ilike', '%' . $search . '%')
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'ilike', '%' . $search . '%')
                   ->orWhere('company', 'ilike', '%' . $search . '%');
+            });
         }
 
         if ($request->has('location')) {
             $query->where('location', 'ilike', '%' . $request->location . '%');
+        }
+
+        if ($request->filled('contract_type')) {
+            $query->where('contract_type', $request->contract_type);
+        }
+
+        if ($request->filled('source')) {
+            $query->where('source', 'ilike', '%' . $request->source . '%');
         }
 
         return response()->json($query->latest()->paginate(10));

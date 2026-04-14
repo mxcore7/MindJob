@@ -10,10 +10,38 @@ class ExternalJobService
 {
     protected string $rapidApiKey;
     protected string $rapidApiHost = 'jsearch.p.rapidapi.com';
+    protected FranceTravailService $franceTravailService;
 
-    public function __construct()
+    public function __construct(FranceTravailService $franceTravailService)
     {
         $this->rapidApiKey = config('services.rapidapi.key', '');
+        $this->franceTravailService = $franceTravailService;
+    }
+
+    /**
+     * Fetch jobs from ALL sources (JSearch + France Travail)
+     */
+    public function fetchAllSources(string $query = 'developer', string $location = '', int $numPages = 1, string $country = 'us'): array
+    {
+        $allJobs = [];
+
+        // JSearch
+        $jsearchJobs = $this->fetchJobs($query, $location, $numPages, $country);
+        $allJobs = array_merge($allJobs, $jsearchJobs);
+
+        // France Travail
+        $ftJobs = $this->fetchFranceTravailJobs($query, $location);
+        $allJobs = array_merge($allJobs, $ftJobs);
+
+        return $allJobs;
+    }
+
+    /**
+     * Fetch jobs from France Travail API
+     */
+    public function fetchFranceTravailJobs(string $query = 'développeur', string $location = ''): array
+    {
+        return $this->franceTravailService->fetchAndStore($query, $location);
     }
 
     /**
@@ -88,6 +116,9 @@ class ExternalJobService
             // Build salary string
             $salary = $this->buildSalaryString($extJob);
 
+            // Map employment type to contract_type
+            $contractType = $this->mapJSearchEmploymentType($extJob['job_employment_type'] ?? null);
+
             $job = Job::create([
                 'title' => $title,
                 'company' => $company,
@@ -98,12 +129,30 @@ class ExternalJobService
                     : ($extJob['job_country'] ?? 'Remote'),
                 'salary' => $salary,
                 'source' => $source,
+                'contract_type' => $contractType,
             ]);
 
             $stored[] = $job;
         }
 
         return $stored;
+    }
+
+    /**
+     * Map JSearch employment type to a readable contract type
+     */
+    protected function mapJSearchEmploymentType(?string $type): ?string
+    {
+        if (!$type) return null;
+
+        $map = [
+            'FULLTIME'   => 'Full-time',
+            'PARTTIME'   => 'Part-time',
+            'CONTRACTOR' => 'Contractor',
+            'INTERN'     => 'Internship',
+        ];
+
+        return $map[strtoupper($type)] ?? $type;
     }
 
     /**

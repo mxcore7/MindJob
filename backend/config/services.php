@@ -39,4 +39,9 @@ return [
         'key' => env('RAPIDAPI_KEY'),
     ],
 
+    'france_travail' => [
+        'client_id'     => env('FRANCE_TRAVAIL_CLIENT_ID'),
+        'client_secret' => env('FRANCE_TRAVAIL_CLIENT_SECRET'),
+    ],
+
 ];

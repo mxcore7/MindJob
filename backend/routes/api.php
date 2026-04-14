@@ -8,8 +8,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RecommendationController;
-
 use App\Http\Controllers\JobApplicationController;
+use App\Http\Controllers\OffreController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -29,4 +29,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/applications', [JobApplicationController::class, 'index']);
     Route::post('/applications', [JobApplicationController::class, 'store']);
     Route::delete('/applications/{id}', [JobApplicationController::class, 'destroy']);
+
+    // France Travail live search
+    Route::get('/offres', [OffreController::class, 'index']);
+    Route::get('/offres/{id}', [OffreController::class, 'show']);
 });
