@@ -65,6 +65,29 @@ const withdraw = async (id) => {
             </button>
           </div>
         </div>
+
+        <div class="mt-4 pt-4 border-t border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-3 py-1 text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-lg">
+              Envoyé
+            </span>
+            <svg class="w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+            <span class="px-3 py-1 text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-lg">
+              Entretien
+            </span>
+            <svg class="w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+            <span class="px-3 py-1 text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg">
+              Refusé
+            </span>
+          </div>
+          <button class="px-4 py-2 text-xs font-medium bg-primary/10 hover:bg-primary/20 text-primary-light rounded-lg border border-primary/20 transition-colors">
+            Gérer le pipeline de recrutement
+          </button>
+        </div>
       </div>
     </div>
   </div>
