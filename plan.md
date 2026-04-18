@@ -51,6 +51,8 @@ Créer une application web intelligente permettant :
 - Matching user ↔ jobs
 - Score de pertinence
 - Suggestions personnalisées
+- Pertinence date
+- Mots cle
 
 ### 5. Dashboard
 - Statistiques utilisateur
