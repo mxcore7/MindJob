@@ -93,6 +93,14 @@ L'une des forces du projet est sa capacité à récupérer et afficher des offre
 **🔌 2. L'agrégation et l'intégration externe :**
 - L'application récupère périodiquement via l'API, RapidAPI, ou d'autres organismes, les dernières offres réelles pour nourrir le site. Tout passe par l'implémentation de la logique métier sécurisée côté backend (`app/Services/`). 
 
+**📊 3. KPI & Analyse Type Power BI :**
+- Un tableau de bord analytique avancé a été intégré à l'interface (sous le Profil) pour suivre la performance de l'application et l'acquisition des données en temps réel via un point d'API dédié (`/api/kpis`).
+- **Indicateurs Clés suivis** :
+  - **Volume de données** : Nombre total d'offres collectées, ainsi que la répartition exacte par source (ex: France Travail).
+  - **Pertinence et Qualité** : Suivi du taux de matching moyen pour les candidats et contrôle du taux de duplication des offres.
+  - **Tendances du marché** : Classement dynamique des compétences les plus demandées par les recruteurs, et top des localisations les plus pourvoyeuses d'emplois.
+- L'interface visuelle s'inspire directement des tableaux de bord interactifs de *Business Intelligence* (Power BI) pour une lecture rapide et percutante des données.
+
 ---
 
 ## 7. Vision de Déploiement
