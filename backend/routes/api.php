@@ -33,4 +33,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // France Travail live search
     Route::get('/offres', [OffreController::class, 'index']);
     Route::get('/offres/{id}', [OffreController::class, 'show']);
+
+    // KPI Dashboard
+    Route::get('/kpis', [\App\Http\Controllers\KpiController::class, 'index']);
 });

@@ -49,6 +49,11 @@ const router = createRouter({
           path: 'profile',
           name: 'profile',
           component: () => import('../views/ProfilePage.vue')
+        },
+        {
+          path: 'kpi',
+          name: 'kpi',
+          component: () => import('../views/KpiPage.vue')
         }
       ]
     }
