@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import axios from 'axios'
+import api from '../api/axios'
 
 export const useAnalyticsStore = defineStore('analytics', {
   state: () => ({
@@ -12,9 +12,9 @@ export const useAnalyticsStore = defineStore('analytics', {
   }),
 
   actions: {
-    async fetchLocations(period = '2025') {
+    async fetchLocations(period = 'all') {
       try {
-        const response = await axios.get(`/api/analytics/locations?period=${period}`)
+        const response = await api.get(`/analytics/locations?period=${period}`)
         this.locations = response.data
       } catch (error) {
         console.error('Error fetching locations:', error)
@@ -22,9 +22,9 @@ export const useAnalyticsStore = defineStore('analytics', {
       }
     },
 
-    async fetchSalaries(period = '2025') {
+    async fetchSalaries(period = 'all') {
       try {
-        const response = await axios.get(`/api/analytics/salaries?period=${period}`)
+        const response = await api.get(`/analytics/salaries?period=${period}`)
         this.salaries = response.data
       } catch (error) {
         console.error('Error fetching salaries:', error)
@@ -32,9 +32,9 @@ export const useAnalyticsStore = defineStore('analytics', {
       }
     },
 
-    async fetchSkills(period = '2025') {
+    async fetchSkills(period = 'all') {
       try {
-        const response = await axios.get(`/api/analytics/skills?period=${period}`)
+        const response = await api.get(`/analytics/skills?period=${period}`)
         this.skills = response.data
       } catch (error) {
         console.error('Error fetching skills:', error)
@@ -42,9 +42,9 @@ export const useAnalyticsStore = defineStore('analytics', {
       }
     },
 
-    async fetchDashboard(period = '2025') {
+    async fetchDashboard(period = 'all') {
       try {
-        const response = await axios.get(`/api/analytics/dashboard?period=${period}`)
+        const response = await api.get(`/analytics/dashboard?period=${period}`)
         this.dashboard = response.data
       } catch (error) {
         console.error('Error fetching dashboard:', error)

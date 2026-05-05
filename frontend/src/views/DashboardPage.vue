@@ -11,7 +11,7 @@ const authStore = useAuthStore()
 const analyticsStore = useAnalyticsStore()
 
 // État pour les analyses
-const selectedPeriod = ref('2025')
+const selectedPeriod = ref('all')
 const loadingAnalytics = ref(false)
 
 onMounted(async () => {
@@ -135,6 +135,7 @@ const topSkillsData = computed(() => {
     <!-- Sélecteur d'année pour analyses -->
     <div class="mb-6 flex justify-end">
       <select v-model="selectedPeriod">
+  <option value="all">📊 Toutes les données</option>
   <option value="2025">📊 Année 2025 </option>
   <option value="2026_q1">📊 Février - Avril 2026</option>
 </select>
@@ -177,12 +178,12 @@ const topSkillsData = computed(() => {
             <div class="text-center">
               <div class="text-3xl font-bold text-emerald-400">{{ locationsData?.remote_vs_onsite?.remote || 0 }}</div>
               <div class="text-xs text-slate-500 mt-1">Télétravail</div>
-              <div class="text-xs text-slate-600">{{ Math.round((locationsData?.remote_vs_onsite?.remote / (locationsData?.remote_vs_onsite?.remote + locationsData?.remote_vs_onsite?.onsite)) * 100) || 0 }}%</div>
+              <div class="text-xs text-slate-600">{{ (locationsData?.remote_vs_onsite?.remote && (locationsData?.remote_vs_onsite?.remote + locationsData?.remote_vs_onsite?.onsite) > 0) ? Math.round((locationsData.remote_vs_onsite.remote / (locationsData.remote_vs_onsite.remote + locationsData.remote_vs_onsite.onsite)) * 100) : 0 }}%</div>
             </div>
             <div class="text-center">
               <div class="text-3xl font-bold text-amber-400">{{ locationsData?.remote_vs_onsite?.onsite || 0 }}</div>
               <div class="text-xs text-slate-500 mt-1">Présentiel</div>
-              <div class="text-xs text-slate-600">{{ Math.round((locationsData?.remote_vs_onsite?.onsite / (locationsData?.remote_vs_onsite?.remote + locationsData?.remote_vs_onsite?.onsite)) * 100) || 0 }}%</div>
+              <div class="text-xs text-slate-600">{{ (locationsData?.remote_vs_onsite?.onsite && (locationsData?.remote_vs_onsite?.remote + locationsData?.remote_vs_onsite?.onsite) > 0) ? Math.round((locationsData.remote_vs_onsite.onsite / (locationsData.remote_vs_onsite.remote + locationsData.remote_vs_onsite.onsite)) * 100) : 0 }}%</div>
             </div>
           </div>
         </div>
