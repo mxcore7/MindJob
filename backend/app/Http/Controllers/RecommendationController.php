@@ -23,4 +23,16 @@ class RecommendationController extends Controller
         
         return response()->json($recommendedJobs);
     }
+    
+    /**
+     * Rafraîchir les recommandations
+     * GET /api/recommendations/refresh
+     */
+    public function refresh(Request $request)
+    {
+        $user = $request->user();
+        $this->recommendationService->refreshCache($user);
+        
+        return $this->index($request);
+    }
 }

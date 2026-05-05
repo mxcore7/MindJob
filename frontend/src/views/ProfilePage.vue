@@ -15,6 +15,12 @@ const skillInput = ref('')
 const loading = ref(false)
 const successMessage = ref('')
 
+// Upload CV
+const uploading = ref(false)
+const extractedSkills = ref([])
+const cvFile = ref(null)
+const coverLetterFile = ref(null)
+
 onMounted(async () => {
   await authStore.fetchUser()
   if (authStore.user) {
@@ -50,6 +56,89 @@ const saveProfile = async () => {
     console.error('Failed to update profile', err)
   } finally {
     loading.value = false
+  }
+}
+
+// Upload CV
+const handleCvChange = (event) => {
+  cvFile.value = event.target.files[0]
+}
+
+const handleCoverLetterChange = (event) => {
+  coverLetterFile.value = event.target.files[0]
+}
+
+const uploadCv = async () => {
+  if (!cvFile.value) {
+    alert('Sélectionnez un fichier PDF')
+    return
+  }
+  
+  uploading.value = true
+  const formData = new FormData()
+  formData.append('cv', cvFile.value)
+  
+  try {
+    const response = await apiClient.post('/upload/cv', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    
+    extractedSkills.value = response.data.extracted_skills || []
+    
+    // Ajouter les compétences extraites au formulaire
+    if (response.data.all_skills) {
+      const newSkills = response.data.all_skills.split(', ')
+      newSkills.forEach(skill => {
+        if (!form.value.skills.includes(skill)) {
+          form.value.skills.push(skill)
+        }
+      })
+    }
+    
+    alert('CV uploadé avec succès ! ' + (extractedSkills.value.length ? `${extractedSkills.value.length} compétences extraites` : ''))
+    cvFile.value = null
+  } catch (error) {
+    console.error(error)
+    alert('Erreur lors de l\'upload du CV')
+  } finally {
+    uploading.value = false
+  }
+}
+
+const uploadCoverLetter = async () => {
+  if (!coverLetterFile.value) {
+    alert('Sélectionnez un fichier PDF')
+    return
+  }
+  
+  uploading.value = true
+  const formData = new FormData()
+  formData.append('cover_letter', coverLetterFile.value)
+  
+  try {
+    await apiClient.post('/upload/cover-letter', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    alert('Lettre de motivation uploadée avec succès !')
+    coverLetterFile.value = null
+  } catch (error) {
+    console.error(error)
+    alert('Erreur lors de l\'upload de la lettre de motivation')
+  } finally {
+    uploading.value = false
+  }
+}
+
+const deleteCv = async () => {
+  if (!confirm('Supprimer votre CV ?')) return
+  
+  try {
+    await apiClient.delete('/upload/cv')
+    extractedSkills.value = []
+    alert('CV supprimé avec succès')
+  } catch (error) {
+    console.error(error)
+    alert('Erreur lors de la suppression du CV')
   }
 }
 </script>
@@ -92,6 +181,68 @@ const saveProfile = async () => {
         </div>
       </div>
 
+      <!-- Section Upload CV -->
+      <div class="glass rounded-2xl p-6">
+        <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-5 flex items-center gap-2">
+          <svg class="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+          CV Upload
+        </h3>
+        
+        <!-- Upload CV -->
+        <div class="mb-4">
+          <label class="block">
+            <input type="file" @change="handleCvChange" accept=".pdf" class="hidden" />
+            <div class="border-2 border-dashed border-white/20 rounded-xl p-6 text-center cursor-pointer hover:border-primary/50 transition-colors">
+              <svg class="w-10 h-10 text-slate-500 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+              <p class="text-sm text-slate-400">Cliquez pour uploader votre CV (PDF)</p>
+              <p class="text-xs text-slate-600 mt-1">Max 5MB</p>
+              <p v-if="cvFile" class="text-xs text-primary-light mt-2">{{ cvFile.name }}</p>
+            </div>
+          </label>
+          <button type="button" @click="uploadCv" :disabled="uploading || !cvFile" class="mt-4 w-full btn-gradient py-2 rounded-xl font-medium disabled:opacity-50">
+            {{ uploading ? 'Upload...' : 'Uploader mon CV' }}
+          </button>
+          <button type="button" @click="deleteCv" class="mt-2 w-full bg-red-500/20 hover:bg-red-500/30 text-red-400 py-2 rounded-xl font-medium transition-colors text-sm">
+            Supprimer mon CV
+          </button>
+        </div>
+        
+        <!-- Compétences extraites -->
+        <div v-if="extractedSkills.length" class="mt-4 p-3 bg-primary/10 rounded-xl">
+          <p class="text-xs text-primary-light mb-2">✨ Compétences extraites de votre CV :</p>
+          <div class="flex flex-wrap gap-2">
+            <span v-for="skill in extractedSkills" :key="skill" class="px-2 py-1 text-xs rounded-full bg-primary/20 text-primary-light">
+              {{ skill }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Lettre de motivation -->
+      <div class="glass rounded-2xl p-6">
+        <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-5 flex items-center gap-2">
+          <svg class="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+          Lettre de motivation
+        </h3>
+        
+        <label class="block">
+          <input type="file" @change="handleCoverLetterChange" accept=".pdf" class="hidden" />
+          <div class="border-2 border-dashed border-white/20 rounded-xl p-6 text-center cursor-pointer hover:border-primary/50 transition-colors">
+            <svg class="w-10 h-10 text-slate-500 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            <p class="text-sm text-slate-400">Téléchargez votre lettre de motivation (PDF)</p>
+            <p class="text-xs text-slate-600 mt-1">Max 5MB</p>
+            <p v-if="coverLetterFile" class="text-xs text-primary-light mt-2">{{ coverLetterFile.name }}</p>
+          </div>
+        </label>
+        <button type="button" @click="uploadCoverLetter" :disabled="uploading || !coverLetterFile" class="mt-4 w-full bg-white/10 hover:bg-white/20 py-2 rounded-xl font-medium transition-colors disabled:opacity-50">
+          {{ uploading ? 'Upload...' : 'Uploader ma lettre' }}
+        </button>
+      </div>
+
       <!-- Skills -->
       <div class="glass rounded-2xl p-6">
         <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-5 flex items-center gap-2">
@@ -115,7 +266,7 @@ const saveProfile = async () => {
       </div>
 
       <!-- Save -->
-      <div class="flex justify-end">
+      <div class="flex justify-end gap-3">
         <button type="submit" :disabled="loading" class="btn-gradient px-8 py-3 rounded-xl text-sm flex items-center gap-2 disabled:opacity-60 cursor-pointer">
           <svg v-if="loading" class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
           Save Changes
@@ -124,3 +275,42 @@ const saveProfile = async () => {
     </form>
   </div>
 </template>
+
+<style scoped>
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.btn-gradient {
+  background: linear-gradient(135deg, #6366f1, #06b6d4);
+  transition: all 0.3s ease;
+}
+
+.btn-gradient:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.glass {
+  background: rgba(15, 25, 35, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.input-dark {
+  background: rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.input-dark:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #6366f1;
+  outline: none;
+}
+</style>

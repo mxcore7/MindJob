@@ -47,11 +47,13 @@ export const useJobsStore = defineStore('jobs', {
     },
 
     async fetchApplications() {
+      console.log('🔵 Récupération des candidatures...')
       try {
         const response = await apiClient.get('/applications')
+        console.log('🔵 Candidatures reçues:', response.data)
         this.applications = response.data
       } catch (err) {
-        console.error('Failed to fetch applications', err)
+        console.error('🔴 Erreur fetchApplications:', err)
       }
     },
 
@@ -68,12 +70,22 @@ export const useJobsStore = defineStore('jobs', {
     },
 
     async withdrawApplication(id) {
+      console.log('🔵 Tentative suppression ID:', id)
+      console.log('🔵 Token:', localStorage.getItem('auth_token'))
+      
       try {
-        await apiClient.delete(`/applications/${id}`)
+        const response = await apiClient.delete(`/applications/${id}`)
+        console.log('🔵 Réponse:', response)
+        console.log('🔵 Statut:', response.status)
         this.applications = this.applications.filter(a => a.id !== id)
+        alert('✅ Candidature retirée avec succès !')
         return true
       } catch (err) {
-        console.error('Failed to withdraw', err)
+        console.error('🔴 ERREUR COMPLÈTE:', err)
+        console.error('🔴 Message:', err.message)
+        console.error('🔴 Réponse du serveur:', err.response?.data)
+        console.error('🔴 Statut HTTP:', err.response?.status)
+        alert('❌ Erreur: ' + (err.response?.data?.message || err.message))
         return false
       }
     },
