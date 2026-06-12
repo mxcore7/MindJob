@@ -3,7 +3,7 @@ import axios from 'axios'
 // Configure Axios for Laravel Sanctum
 // Assume backend is on localhost:8000
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8000/api',
+  baseURL: '/api',
   withCredentials: true,
   headers: {
     'Accept': 'application/json',
